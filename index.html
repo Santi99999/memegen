@@ -66,65 +66,80 @@
     </div>
 
     <script>
-        const form = document.getElementById('custom-meme-form');
-        const imageInput = document.getElementById('image-input');
-        const topText = document.getElementById('top-text');
-        const bottomText = document.getElementById('bottom-text');
-        const customText = document.getElementById('custom-text');
-        const generatedMeme = document.getElementById('generated-meme');
-        const memeImg = document.getElementById('meme-img');
+// ...
 
-        form.addEventListener('submit', function(e) {
-            e.preventDefault();
+form.addEventListener('submit', function(e) {
+    e.preventDefault();
 
-            const file = imageInput.files[0];
-            const reader = new FileReader();
+    const file = imageInput.files[0];
+    const reader = new FileReader();
 
-            reader.onloadend = function() {
-                const img = new Image();
-                img.src = reader.result;
+    reader.onloadend = function() {
+        const img = new Image();
+        img.src = reader.result;
 
-                img.onload = function() {
-                    const canvas = document.createElement('canvas');
-                    const context = canvas.getContext('2d');
-                    canvas.width = img.width;
-                    canvas.height = img.height;
-                    context.drawImage(img, 0, 0);
+        img.onload = function() {
+            const canvas = document.createElement('canvas');
+            const context = canvas.getContext('2d');
 
-                    const textSize = Math.floor(img.width / 10);
+            const MAX_WIDTH = 500; // Ancho máximo del meme
+            const MAX_HEIGHT = 500; // Altura máxima del meme
 
-                    context.font = `${textSize}px Impact`;
-                    context.textAlign = 'center';
-                    context.strokeStyle = 'black';
-                    context.lineWidth = textSize / 20;
-                    context.fillStyle = 'white';
+            let width = img.width;
+            let height = img.height;
 
-                    const topTextY = textSize;
-                    const bottomTextY = img.height - textSize;
-
-                    context.strokeText(topText.value, canvas.width / 2, topTextY);
-                    context.fillText(topText.value, canvas.width / 2, topTextY);
-
-                    context.strokeText(bottomText.value, canvas.width / 2, bottomTextY);
-                    context.fillText(bottomText.value, canvas.width / 2, bottomTextY);
-
-                    if (customText.value) {
-                        const customTextY = img.height / 2;
-                        context.strokeText(customText.value, canvas.width / 2, customTextY);
-                        context.fillText(customText.value, canvas.width / 2, customTextY);
-                    }
-
-                    memeImg.src = canvas.toDataURL();
-                    generatedMeme.style.display = 'block';
-                };
-
-                img.src = reader.result;
-            };
-
-            if (file) {
-                reader.readAsDataURL(file);
+            // Redimensionar la imagen si supera los límites
+            if (width > MAX_WIDTH) {
+                height *= MAX_WIDTH / width;
+                width = MAX_WIDTH;
             }
-        });
+
+            if (height > MAX_HEIGHT) {
+                width *= MAX_HEIGHT / height;
+                height = MAX_HEIGHT;
+            }
+
+            canvas.width = width;
+            canvas.height = height;
+            context.drawImage(img, 0, 0, width, height);
+
+            const textSize = Math.floor(width / 10);
+
+            context.font = `${textSize}px Impact`;
+            context.textAlign = 'center';
+            context.strokeStyle = 'black';
+            context.lineWidth = textSize / 20;
+            context.fillStyle = 'white';
+
+            const topTextY = textSize;
+            const bottomTextY = height - textSize;
+
+            context.strokeText(topText.value, width / 2, topTextY);
+            context.fillText(topText.value, width / 2, topTextY);
+
+            context.strokeText(bottomText.value, width / 2, bottomTextY);
+            context.fillText(bottomText.value, width / 2, bottomTextY);
+
+            if (customText.value) {
+                const customTextY = height / 2;
+                context.strokeText(customText.value, width / 2, customTextY);
+                context.fillText(customText.value, width / 2, customTextY);
+            }
+
+            memeImg.src = canvas.toDataURL();
+            generatedMeme.style.display = 'block';
+        };
+
+        img.src = reader.result;
+    };
+
+    if (file) {
+        reader.readAsDataURL(file);
+    }
+});
+
+// ...
+
     </script>
 </body>
 </html>
