@@ -1,0 +1,130 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>memegen</title>
+    <style>
+        .meme-container {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+        }
+
+        .meme-template {
+            margin: 10px;
+        }
+
+        .meme-template img {
+            max-width: 100%;
+        }
+
+        .meme-form {
+            margin-top: 20px;
+            text-align: center;
+        }
+
+        .meme-form input[type="text"] {
+            margin: 10px 0;
+            width: 300px;
+        }
+    </style>
+</head>
+<body>
+    <h1>Generador de Memes</h1>
+
+    <div class="meme-container">
+        <div class="meme-template">
+            <img src="https://i.imgflip.com/4/k5h8q.jpg" alt="...">
+        </div>
+        <div class="meme-template">
+            <img src="https://i.imgflip.com/1b47f0.jpg" alt="shagi">
+        </div>
+        <div class="meme-template">
+            <img src="https://i.imgflip.com/2h7fjw.jpg" alt="sinko peso mlg">
+        </div>
+        <div class="meme-template">
+            <img src="https://i.imgflip.com/qt94u.jpg" alt="bolsa con muchisimo aire">
+        </div>
+        <div class="meme-template">
+            <img src="https://i.imgflip.com/34yx3j.png" alt="N O">
+        </div>
+    </div>
+
+    <div class="meme-form">
+        <h2>Generar meme personalizado</h2>
+        <form id="custom-meme-form">
+            <input type="file" accept="image/*" id="image-input" required>
+            <input type="text" id="top-text" placeholder="Texto superior">
+            <input type="text" id="bottom-text" placeholder="Texto inferior">
+            <input type="text" id="custom-text" placeholder="Texto personalizado (opcional)">
+            <button type="submit">Generar Meme</button>
+        </form>
+    </div>
+
+    <div id="generated-meme" style="display: none; text-align: center;">
+        <h2>Meme generado</h2>
+        <img id="meme-img" alt="Meme generado">
+    </div>
+
+    <script>
+        const form = document.getElementById('custom-meme-form');
+        const imageInput = document.getElementById('image-input');
+        const topText = document.getElementById('top-text');
+        const bottomText = document.getElementById('bottom-text');
+        const customText = document.getElementById('custom-text');
+        const generatedMeme = document.getElementById('generated-meme');
+        const memeImg = document.getElementById('meme-img');
+
+        form.addEventListener('submit', function(e) {
+            e.preventDefault();
+
+            const file = imageInput.files[0];
+            const reader = new FileReader();
+
+            reader.onloadend = function() {
+                const img = new Image();
+                img.src = reader.result;
+
+                img.onload = function() {
+                    const canvas = document.createElement('canvas');
+                    const context = canvas.getContext('2d');
+                    canvas.width = img.width;
+                    canvas.height = img.height;
+                    context.drawImage(img, 0, 0);
+
+                    const textSize = Math.floor(img.width / 10);
+
+                    context.font = `${textSize}px Impact`;
+                    context.textAlign = 'center';
+                    context.strokeStyle = 'black';
+                    context.lineWidth = textSize / 20;
+                    context.fillStyle = 'white';
+
+                    const topTextY = textSize;
+                    const bottomTextY = img.height - textSize;
+
+                    context.strokeText(topText.value, canvas.width / 2, topTextY);
+                    context.fillText(topText.value, canvas.width / 2, topTextY);
+
+                    context.strokeText(bottomText.value, canvas.width / 2, bottomTextY);
+                    context.fillText(bottomText.value, canvas.width / 2, bottomTextY);
+
+                    if (customText.value) {
+                        const customTextY = img.height / 2;
+                        context.strokeText(customText.value, canvas.width / 2, customTextY);
+                        context.fillText(customText.value, canvas.width / 2, customTextY);
+                    }
+
+                    memeImg.src = canvas.toDataURL();
+                    generatedMeme.style.display = 'block';
+                };
+
+                img.src = reader.result;
+            };
+
+            if (file) {
+                reader.readAsDataURL(file);
+            }
+        });
+    </script>
+</body>
+</html>
